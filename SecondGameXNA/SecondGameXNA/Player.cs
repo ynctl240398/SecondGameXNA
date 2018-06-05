@@ -24,30 +24,41 @@ namespace SecondGameXNA
         private Point Position;
         private Point FirstPosition;
         private Rectangle rectangle;
-        private const int Speed = 1;
+        private const int Speed = 65;
         private const int wPlayer = 65, hPlayer = 65;
         private int LastTickCount;
         private const int Timer = 70;
         private DirectionOfMotion directionOfmotion;
         private bool Moving;
-        private int sizeButton;
-        private int sobutton;
 
-        public Player(Game game, ref Texture2D texture, int sobutton, int sizeButton)
+
+        public Player(Game game, ref Texture2D texture)
             :base(game)
         {
             this.PlayerTexture = texture;
-            this.sobutton = sobutton;
-            this.sizeButton = sizeButton;
             Position = new Point(0, 0);
             FirstPosition = Position;
             Frame = new Point(0, 0);
             LimitFrame = new Point(4, 4);
             LastTickCount = System.Environment.TickCount;
-            rectangle = new Rectangle(0, 0, Game.Window.ClientBounds.Width, Game.Window.ClientBounds.Height);
+            rectangle = new Rectangle(0, 0, wPlayer, hPlayer);
             sBatch = (SpriteBatch)Game.Services.GetService(typeof(SpriteBatch));
         }
 
+        public bool CheckCollision(Rectangle rec)
+        {
+            Rectangle spriterect = new Rectangle(Position.X, Position.Y, wPlayer, hPlayer);
+            return spriterect.Intersects(rec);
+        }
+            
+
+        public Rectangle GetBounds()
+        {
+            return new Rectangle(Position.X, Position.Y, wPlayer, hPlayer);
+        }
+
+
+      
         private void UpdateStatus()
         {
             if (Moving)
@@ -60,10 +71,11 @@ namespace SecondGameXNA
             }
             else Frame.X = 0;
         }
-
         private void Move()
         {
             Moving = true;
+
+            Thread.Sleep(100);
 
             if (directionOfmotion == DirectionOfMotion.Down)
             {
@@ -91,8 +103,8 @@ namespace SecondGameXNA
 
         private void Check()
         {
-            int x = this.sobutton * sizeButton + FirstPosition.X;
-            int y = this.sobutton * sizeButton + FirstPosition.Y;
+            int x = Game.Window.ClientBounds.Width;
+            int y = Game.Window.ClientBounds.Height;
             if (Position.X + 18 < FirstPosition.X)
             {
                 Position.X += Speed;
@@ -121,34 +133,39 @@ namespace SecondGameXNA
                 UpdateStatus();
             }
 
+            int lasttickcount1 = System.Environment.TickCount;
+
             if (keyboard.IsKeyDown(Keys.A) || keyboard.IsKeyDown(Keys.Left))
             {
-                directionOfmotion = DirectionOfMotion.Left;
-                Move();
+                    directionOfmotion = DirectionOfMotion.Left;
+                    Move();
 
-                return;
+                    return;
+                
             }
             else if (keyboard.IsKeyDown(Keys.D) || keyboard.IsKeyDown(Keys.Right))
             {
-                directionOfmotion = DirectionOfMotion.Rigth;
+                    directionOfmotion = DirectionOfMotion.Rigth;
+                    Move();
 
-                Move();
+                    return;
 
-                return;
             }
             else if (keyboard.IsKeyDown(Keys.W) || keyboard.IsKeyDown(Keys.Up))
             {
-                directionOfmotion = DirectionOfMotion.Up;
-                Move();
+                    directionOfmotion = DirectionOfMotion.Up;
+                    Move();
 
-                return;
+                    return;
+
             }
             else if (keyboard.IsKeyDown(Keys.S) || keyboard.IsKeyDown(Keys.Down))
             {
-                directionOfmotion = DirectionOfMotion.Down;
-                Move();
+                    directionOfmotion = DirectionOfMotion.Down;
+                    Move();
 
-                return;
+                    return;
+
             }
             this.Moving = false;
 

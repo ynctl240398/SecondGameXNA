@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using System.Threading;
 
 namespace SecondGameXNA
 {
@@ -20,9 +21,11 @@ namespace SecondGameXNA
         SpriteBatch spriteBatch;
 
         private Player player;
-        private Texture2D texture;
+        private Texture2D texture, textureButton, textureboom;
 
-        private const int sobutton = 7, sizeButton = 53;
+        private const int sobutton = 10, sizeButton = 65, soboom = 40;
+        private int[,] bstate = new int[sobutton, sobutton];
+        private int count = 0;
         private Rectangle[,] ButtonRectengle = new Rectangle[sobutton, sobutton];
         private Texture2D[,] ButtonTexture = new Texture2D[sobutton, sobutton];
         
@@ -45,7 +48,7 @@ namespace SecondGameXNA
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            Window.Title = "DoMin";
+            Window.Title = "Dò Mìn";
 
             int y = 0;
             for (int i = 0; i < sobutton; i++)
@@ -55,6 +58,7 @@ namespace SecondGameXNA
                 {
                     ButtonRectengle[i,j] = new Rectangle(x, y, sizeButton, sizeButton);
                     x += sizeButton;
+                    bstate[i, j] = 1;
                 }
                 y += sizeButton;
             }
@@ -76,13 +80,16 @@ namespace SecondGameXNA
 
             texture = Content.Load<Texture2D>("player");
 
-            
+            textureButton = Content.Load<Texture2D>("img_poit9");
+
+            textureboom = Content.Load<Texture2D>("img_bom");
+
+            //ButtonTexture[0, 0] = Content.Load<Texture2D>("img_poit9");
+
             for (int i = 0; i < sobutton; i++)
-            {
-                for (int j = 0; j < sobutton; j++)
-                
-                    ButtonTexture[i, j] = Content.Load<Texture2D>("img_cell");
-            }
+                for (int j = 0; j < sobutton; j++)            
+                        ButtonTexture[i, j] = Content.Load<Texture2D>("img_cell");
+ 
           
             // TODO: use this.Content to load your game content here
         }
@@ -108,10 +115,45 @@ namespace SecondGameXNA
                 this.Exit();
             if (player == null)
             {
-                player = new Player(this, ref texture, sobutton, sizeButton);
+                player = new Player(this, ref texture);
                 Components.Add(player);
             }
 
+            for (int i = 0; i < sobutton; i++)
+            {
+                for (int j = 0; j < sobutton; j++)
+                {
+                    if (player.GetBounds() == ButtonRectengle[i,j])
+                                    
+                        ButtonTexture[i, j] = textureButton;
+                }
+            }
+            Random rand = new Random();
+            while (count < soboom)
+            {
+                //for (int i = 0; i < sobutton; i++)
+                //{
+                //    for (int j = 0; j < sobutton; j++)
+                //    {
+                //        i = rand.Next(sobutton);
+                //        j = rand.Next(sobutton);
+                //        if ()
+                //        {
+
+                //        }
+                //    }
+                //}
+                int i = rand.Next(sobutton), j = rand.Next(sobutton);
+                if (bstate[i,j] == 1)
+                {
+                    bstate[i, j] = -1;
+                    ButtonTexture[i, j] = textureboom;
+                    count++;
+                }
+            }
+
+         
+            
             // TODO: Add your update logic here
 
             base.Update(gameTime);
