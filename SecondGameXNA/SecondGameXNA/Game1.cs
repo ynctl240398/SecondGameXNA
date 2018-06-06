@@ -12,18 +12,16 @@ using System.Threading;
 
 namespace SecondGameXNA
 {
-    /// <summary>
-    /// This is the main type for your game
-    /// </summary>
+   
     public class Game1 : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
         private Player player;
-        private Texture2D texture, textureButton, textureboom;
+        private Texture2D texture, textureButton, textureboom,tetu;
 
-        private const int sobutton = 10, sizeButton = 65, soboom = 40;
+        private const int sobutton = 10, sizeButton = 65, soboom = 30;
         private int[,] bstate = new int[sobutton, sobutton];
         private int count = 0;
         private Rectangle[,] ButtonRectengle = new Rectangle[sobutton, sobutton];
@@ -39,15 +37,10 @@ namespace SecondGameXNA
             graphics.PreferredBackBufferHeight = sizeButton * sobutton;
         }
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
+       
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+         
             Window.Title = "Dò Mìn";
 
             int y = 0;
@@ -67,13 +60,10 @@ namespace SecondGameXNA
             base.Initialize();
         }
 
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
+      
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
+         
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             Services.AddService(typeof(SpriteBatch), spriteBatch);
@@ -84,35 +74,25 @@ namespace SecondGameXNA
 
             textureboom = Content.Load<Texture2D>("img_bom");
 
-            //ButtonTexture[0, 0] = Content.Load<Texture2D>("img_poit9");
+            tetu = Content.Load<Texture2D>("img_poit9");
 
             for (int i = 0; i < sobutton; i++)
                 for (int j = 0; j < sobutton; j++)            
                         ButtonTexture[i, j] = Content.Load<Texture2D>("img_cell");
  
           
-            // TODO: use this.Content to load your game content here
+          
         }
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
-        /// </summary>
+   
         protected override void UnloadContent()
         {
-            // TODO: Unload any non ContentManager content here
+           
         }
 
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Update(GameTime gameTime)
+
+        protected void start()
         {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
             if (player == null)
             {
                 player = new Player(this, ref texture);
@@ -123,28 +103,80 @@ namespace SecondGameXNA
             {
                 for (int j = 0; j < sobutton; j++)
                 {
-                    if (player.GetBounds() == ButtonRectengle[i,j])
-                                    
+                    if (player.GetBounds() == ButtonRectengle[i, j])
+
                         ButtonTexture[i, j] = textureButton;
                 }
             }
+
+
+
             Random rand = new Random();
+            int a = 0;
+            int b = 0;
+            bstate[0, 0] = 2;
+
+            switch (rand.Next(1, 2))
+            {
+                case 1:
+                    bstate[0, 1] = 2;
+                    break;
+                    b = 1;
+                case 2:
+                    bstate[1, 0] = 2;
+                    a = 1;
+                    break;
+            }
+
+
+            while (bstate[9, 9] != 2)
+            {
+                int[] r = new int[5];
+                r[1] = 1;
+                r[2] = 2;
+                r[3] = 3;
+                r[4] = 4;
+                if (a == 0) r[3] = 0;
+                if (a == 9) r[1] = 0;
+                if (b == 0) r[4] = 0;
+                if (b == 9) r[2] = 0;
+
+                int t = rand.Next(1, 4);
+                while (r[t] == 0)
+                    t = rand.Next(1, 4);
+
+                switch (t)
+                {
+                    case 1:
+                        bstate[a + 1, b] = 2;
+                        ButtonTexture[a + 1, b] = tetu;
+                        a = a + 1;
+                        break;
+                    case 2:
+                        bstate[a, b + 1] = 2;
+
+                        ButtonTexture[a, b + 1] = tetu;
+                        b = b + 1;
+                        break;
+                    case 3:
+                        bstate[a - 1, b] = 2;
+                        ButtonTexture[a - 1, b] = tetu;
+                        a = a - 1;
+                        break;
+                    case 4:
+                        bstate[a, b - 1] = 2;
+                        ButtonTexture[a, b - 1] = tetu;
+                        b = b - 1;
+                        break;
+                }
+
+
+            }
+
             while (count < soboom)
             {
-                //for (int i = 0; i < sobutton; i++)
-                //{
-                //    for (int j = 0; j < sobutton; j++)
-                //    {
-                //        i = rand.Next(sobutton);
-                //        j = rand.Next(sobutton);
-                //        if ()
-                //        {
-
-                //        }
-                //    }
-                //}
-                int i = rand.Next(sobutton), j = rand.Next(sobutton);
-                if (bstate[i,j] == 1)
+                int i = rand.Next(sobutton ), j = rand.Next(sobutton);
+                if (bstate[i, j] == 1)
                 {
                     bstate[i, j] = -1;
                     ButtonTexture[i, j] = textureboom;
@@ -152,17 +184,32 @@ namespace SecondGameXNA
                 }
             }
 
+
+
+
+
+
+        }
+        protected override void Update(GameTime gameTime)
+        {
+         
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+                this.Exit();
+            if (player == null)
+            {
+                start();
+            }
+
+           
+
          
             
-            // TODO: Add your update logic here
+          
 
             base.Update(gameTime);
         }
 
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+       
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
@@ -178,7 +225,7 @@ namespace SecondGameXNA
             
             spriteBatch.End();
 
-            // TODO: Add your drawing code here
+         
 
             base.Draw(gameTime);
         }

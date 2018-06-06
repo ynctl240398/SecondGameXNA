@@ -19,6 +19,8 @@ namespace SecondGameXNA
     {
         private SpriteBatch sBatch;
         private Texture2D PlayerTexture;
+
+
         private Point Frame;
         private Point LimitFrame;
         private Point Position;
@@ -30,10 +32,11 @@ namespace SecondGameXNA
         private const int Timer = 70;
         private DirectionOfMotion directionOfmotion;
         private bool Moving;
+        private int a = 0;
 
 
         public Player(Game game, ref Texture2D texture)
-            :base(game)
+            : base(game)
         {
             this.PlayerTexture = texture;
             Position = new Point(0, 0);
@@ -50,7 +53,7 @@ namespace SecondGameXNA
             Rectangle spriterect = new Rectangle(Position.X, Position.Y, wPlayer, hPlayer);
             return spriterect.Intersects(rec);
         }
-            
+
 
         public Rectangle GetBounds()
         {
@@ -58,7 +61,7 @@ namespace SecondGameXNA
         }
 
 
-      
+
         private void UpdateStatus()
         {
             if (Moving)
@@ -73,9 +76,12 @@ namespace SecondGameXNA
         }
         private void Move()
         {
+            a = 1;
+            Thread.Sleep(150);
+            
             Moving = true;
 
-            Thread.Sleep(100);
+
 
             if (directionOfmotion == DirectionOfMotion.Down)
             {
@@ -99,12 +105,14 @@ namespace SecondGameXNA
             }
 
             Check();
+            a = 0;
         }
 
         private void Check()
         {
             int x = Game.Window.ClientBounds.Width;
             int y = Game.Window.ClientBounds.Height;
+
             if (Position.X + 18 < FirstPosition.X)
             {
                 Position.X += Speed;
@@ -125,7 +133,7 @@ namespace SecondGameXNA
 
         public override void Update(GameTime gameTime)
         {
-            KeyboardState keyboard = Keyboard.GetState();
+           
 
             if (System.Environment.TickCount - LastTickCount > Timer - Speed)
             {
@@ -135,39 +143,42 @@ namespace SecondGameXNA
 
             int lasttickcount1 = System.Environment.TickCount;
 
-            if (keyboard.IsKeyDown(Keys.A) || keyboard.IsKeyDown(Keys.Left))
+            if (a == 0)
             {
+                KeyboardState keyboard = Keyboard.GetState();
+                if (keyboard.IsKeyDown(Keys.A) || keyboard.IsKeyDown(Keys.Left))
+                {
                     directionOfmotion = DirectionOfMotion.Left;
                     Move();
-
                     return;
-                
-            }
-            else if (keyboard.IsKeyDown(Keys.D) || keyboard.IsKeyDown(Keys.Right))
-            {
+
+                }
+                else if (keyboard.IsKeyDown(Keys.D) || keyboard.IsKeyDown(Keys.Right))
+                {
                     directionOfmotion = DirectionOfMotion.Rigth;
                     Move();
 
                     return;
 
-            }
-            else if (keyboard.IsKeyDown(Keys.W) || keyboard.IsKeyDown(Keys.Up))
-            {
+                }
+                else if (keyboard.IsKeyDown(Keys.W) || keyboard.IsKeyDown(Keys.Up))
+                {
                     directionOfmotion = DirectionOfMotion.Up;
                     Move();
 
                     return;
 
-            }
-            else if (keyboard.IsKeyDown(Keys.S) || keyboard.IsKeyDown(Keys.Down))
-            {
+                }
+                else if (keyboard.IsKeyDown(Keys.S) || keyboard.IsKeyDown(Keys.Down))
+                {
                     directionOfmotion = DirectionOfMotion.Down;
                     Move();
 
                     return;
 
+                }
+                this.Moving = false;
             }
-            this.Moving = false;
 
             base.Update(gameTime);
         }
