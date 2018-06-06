@@ -24,7 +24,7 @@ namespace SecondGameXNA
         private Point Position;
         private Point FirstPosition;
         private Rectangle rectangle;
-        private const int Speed = 2;
+        private const int Speed = 3;
         private const int wPlayer = 65, hPlayer = 65;
         private int LastTickCount;
         private const int Timer = 70;

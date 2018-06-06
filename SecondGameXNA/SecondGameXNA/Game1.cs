@@ -22,7 +22,7 @@ namespace SecondGameXNA
 
         private Player player;
         private Texture2D texture, textureboom;
-        private const int sobutton = 10, sizeButton = 65, soboom = 10;
+        private const int sobutton = 10, sizeButton = 65, soboom = 35;
         private int[,] bstate = new int[sobutton + 2, sobutton + 2];
         private int count = 0;
         private Rectangle[,] ButtonRectengle = new Rectangle[sobutton + 1, sobutton + 1];
@@ -130,12 +130,13 @@ namespace SecondGameXNA
                             if (bstate[i + 1, j - 1] == -1) count++;
                             if (bstate[i + 1, j] == -1) count++;
                             if (bstate[i + 1, j + 1] == -1) count++;
-                        }
-                        
-                        bstate[i, j] = count;
+                            bstate[i, j] = count;
+                        }                       
+
                     }
                 }
             }
+            bstate[10, 10] = 0;
         }
 
         /// <summary>
@@ -290,10 +291,11 @@ namespace SecondGameXNA
                 {
                     if (player.getbound(ButtonRectengle[i, j]))
                     {
-                        if (i != 10 && j != 10)
-                            ButtonTexture[i, j] = ButtonTexture1[i, j];
-                        else
+                        if (i == 10 && j == 10)
                             ButtonTexture[i, j] = ButtonTexture1[10, 10];
+                        else
+                            ButtonTexture[i, j] = ButtonTexture1[i, j];
+                        
                                 
                         if (bstate[i,j] == -1)
                         {
@@ -325,7 +327,7 @@ namespace SecondGameXNA
             {
                 for (int j = 1; j <= sobutton; j++)
                 {
-                    spriteBatch.Draw(ButtonTexture1[i, j], ButtonRectengle[i, j], Color.White);
+                    spriteBatch.Draw(ButtonTexture[i, j], ButtonRectengle[i, j], Color.White);
                 }
             }
             
