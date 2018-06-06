@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -12,21 +12,25 @@ using System.Threading;
 
 namespace SecondGameXNA
 {
-   
+    /// <summary>
+    /// This is the main type for your game
+    /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
         private Player player;
-        private Texture2D texture, textureButton, textureboom,tetu;
-
-        private const int sobutton = 10, sizeButton = 65, soboom = 30;
-        private int[,] bstate = new int[sobutton, sobutton];
+        private Texture2D texture, textureboom;
+        private Texture2D[] textureButton = new Texture2D[10];
+        private const int sobutton = 10, sizeButton = 65, soboom = 50;
+        private int[,] bstate = new int[sobutton + 2, sobutton + 2];
         private int count = 0;
-        private Rectangle[,] ButtonRectengle = new Rectangle[sobutton, sobutton];
-        private Texture2D[,] ButtonTexture = new Texture2D[sobutton, sobutton];
-        
+        private Rectangle[,] ButtonRectengle = new Rectangle[sobutton + 1, sobutton + 1];
+        private Texture2D[,] ButtonTexture = new Texture2D[sobutton + 1, sobutton + 1];
+        private Rectangle[,] ButtonRectengle1 = new Rectangle[sobutton + 1, sobutton + 1];
+        private Texture2D[,] ButtonTexture1 = new Texture2D[sobutton + 1, sobutton + 1];
+
 
         public Game1()
         {
@@ -37,195 +41,258 @@ namespace SecondGameXNA
             graphics.PreferredBackBufferHeight = sizeButton * sobutton;
         }
 
-       
+        /// <summary>
+        /// Allows the game to perform any initialization it needs to before starting to run.
+        /// This is where it can query for any required services and load any non-graphic
+        /// related content.  Calling base.Initialize will enumerate through any components
+        /// and initialize them as well.
+        /// </summary>
         protected override void Initialize()
         {
-         
-            Window.Title = "D� M�n";
+            // TODO: Add your initialization logic here
+            Window.Title = "Dò Mìn";
 
             int y = 0;
-            for (int i = 0; i < sobutton; i++)
+            for (int i = 1; i <= sobutton; i++)
             {
                 int x = 0;
-                for (int j = 0; j < sobutton; j++)
+                for (int j = 1; j <= sobutton; j++)
                 {
-                    ButtonRectengle[i,j] = new Rectangle(x, y, sizeButton, sizeButton);
+                    ButtonRectengle[i, j] = new Rectangle(x, y, sizeButton, sizeButton);
+                    ButtonRectengle1[i, j] = new Rectangle(x, y, sizeButton, sizeButton);
                     x += sizeButton;
                     bstate[i, j] = 1;
                 }
                 y += sizeButton;
             }
 
+            for (int i = 0; i <= sobutton + 1; i++)
+            {
+                bstate[i, 0] = 10;
+                bstate[0, i] = 10;
+                bstate[sobutton + 1, i] = 10;
+                bstate[i, sobutton + 1] = 10;
+            }
 
             base.Initialize();
         }
 
-      
+        /// <summary>
+        /// LoadContent will be called once per game and is the place to load
+        /// all of your content.
+        /// </summary>
         protected override void LoadContent()
         {
-         
+            // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             Services.AddService(typeof(SpriteBatch), spriteBatch);
 
             texture = Content.Load<Texture2D>("player");
 
-            textureButton = Content.Load<Texture2D>("img_poit9");
-
             textureboom = Content.Load<Texture2D>("img_bom");
 
-            tetu = Content.Load<Texture2D>("img_poit9");
+            //ButtonTexture[0, 0] = Content.Load<Texture2D>("img_poit9");
 
-            for (int i = 0; i < sobutton; i++)
-                for (int j = 0; j < sobutton; j++)            
-                        ButtonTexture[i, j] = Content.Load<Texture2D>("img_cell");
- 
-          
-          
+            for (int i = 1; i <= sobutton; i++)
+                for (int j = 1; j <= sobutton; j++)            
+                        ButtonTexture[i, j] = Content.Load<Texture2D>("img_cell");           
+
+            for (int i = 1; i < 10; i++)
+            {
+                switch (i)
+                {
+                    case 9:
+                        textureButton[9] = Content.Load<Texture2D>("img_poit9");
+                        break;
+                    case 1:
+                        textureButton[1] = Content.Load<Texture2D>("img_poit1");
+                        break;
+                    case 2:
+                        textureButton[2] = Content.Load<Texture2D>("img_poit2");
+                        break;
+                    case 3:
+                        textureButton[3] = Content.Load<Texture2D>("img_poit3");
+                        break;
+                    case 4:
+                        textureButton[4] = Content.Load<Texture2D>("img_poit4");
+                        break;
+                    case 5:
+                        textureButton[5] = Content.Load<Texture2D>("img_poit5");
+                        break;
+                    case 6:
+                        textureButton[6] = Content.Load<Texture2D>("img_poit6");
+                        break;
+                    case 7:
+                        textureButton[7] = Content.Load<Texture2D>("img_poit7");
+                        break;
+                    case 8:
+                        textureButton[8] = Content.Load<Texture2D>("img_poit8");
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            for (int i = 1; i <= sobutton; i++)
+                for (int j = 1; j <= sobutton; j++)
+                    ButtonTexture1[i, j] = textureButton[9];
+
+            // TODO: use this.Content to load your game content here
         }
 
-   
+        public void CheckBoom()
+        {
+            for (int i = 1; i <= sobutton; i++)
+            {
+                for (int j = 1; j <= sobutton; j++)
+                {
+                    int count = 0;
+                    if (bstate[i, j] != -1)
+                    {
+                        if (bstate[i - 1, j - 1] == -1)
+                        {
+                            count++;
+                        }
+                        if (bstate[i - 1, j] == -1)
+                        {
+                            count++;
+                        }
+                        if (bstate[i - 1, j + 1] == -1)
+                        {
+                            count++;
+                        }
+                        if (bstate[i, j - 1] == -1)
+                        {
+                            count++;
+                        }
+                        if (bstate[i, j + 1] == -1)
+                        {
+                            count++;
+                        }
+                        if (bstate[i + 1, j - 1] == -1)
+                        {
+                            count++;
+                        }
+                        if (bstate[i + 1, j] == -1)
+                        {
+                            count++;
+                        }
+                        if (bstate[i + 1, j + 1] == -1)
+                        {
+                            count++;
+                        }
+                    }
+                    bstate[i, j] = count;
+                }
+            }
+        }
+
+        /// <summary>
+        /// UnloadContent will be called once per game and is the place to unload
+        /// all content.
+        /// </summary>
         protected override void UnloadContent()
         {
-           
+            // TODO: Unload any non ContentManager content here
         }
 
-
-        protected void start()
+        /// <summary>
+        /// Allows the game to run logic such as updating the world,
+        /// checking for collisions, gathering input, and playing audio.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        protected override void Update(GameTime gameTime)
         {
+            // Allows the game to exit
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+                this.Exit();
             if (player == null)
             {
                 player = new Player(this, ref texture);
                 Components.Add(player);
             }
 
-            for (int i = 0; i < sobutton; i++)
-            {
-                for (int j = 0; j < sobutton; j++)
-                {
-                    if (player.GetBounds() == ButtonRectengle[i, j])
-
-                        ButtonTexture[i, j] = textureButton;
-                }
-            }
-
-
-
+            // 1 là ô bình thường, -1 là cô có boom
+            
             Random rand = new Random();
-            int a = 0;
-            int b = 0;
-            bstate[0, 0] = 2;
-
-            switch (rand.Next(1, 2))
-            {
-                case 1:
-                    bstate[0, 1] = 2;
-                    break;
-                    b = 1;
-                case 2:
-                    bstate[1, 0] = 2;
-                    a = 1;
-                    break;
-            }
-
-
-            while (bstate[9, 9] != 2)
-            {
-                int[] r = new int[5];
-                r[1] = 1;
-                r[2] = 2;
-                r[3] = 3;
-                r[4] = 4;
-                if (a == 0) r[3] = 0;
-                if (a == 9) r[1] = 0;
-                if (b == 0) r[4] = 0;
-                if (b == 9) r[2] = 0;
-
-                int t = rand.Next(1, 4);
-                while (r[t] == 0)
-                    t = rand.Next(1, 4);
-
-                switch (t)
-                {
-                    case 1:
-                        bstate[a + 1, b] = 2;
-                        ButtonTexture[a + 1, b] = tetu;
-                        a = a + 1;
-                        break;
-                    case 2:
-                        bstate[a, b + 1] = 2;
-
-                        ButtonTexture[a, b + 1] = tetu;
-                        b = b + 1;
-                        break;
-                    case 3:
-                        bstate[a - 1, b] = 2;
-                        ButtonTexture[a - 1, b] = tetu;
-                        a = a - 1;
-                        break;
-                    case 4:
-                        bstate[a, b - 1] = 2;
-                        ButtonTexture[a, b - 1] = tetu;
-                        b = b - 1;
-                        break;
-                }
-
-
-            }
-
             while (count < soboom)
             {
-                int i = rand.Next(sobutton ), j = rand.Next(sobutton);
-                if (bstate[i, j] == 1)
+                int i = rand.Next(sobutton), j = rand.Next(sobutton);
+                if (bstate[i, j] == 1 && (i != 1 && j != 1))
                 {
                     bstate[i, j] = -1;
-                    ButtonTexture[i, j] = textureboom;
+                    ButtonTexture1[i, j] = textureboom;
                     count++;
                 }
             }
 
+            CheckBoom();
 
 
-
-
-
-        }
-        protected override void Update(GameTime gameTime)
-        {
-         
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
-            if (player == null)
+            for (int i = 1; i <= sobutton; i++)
             {
-                start();
+                for (int j = 1; j <= sobutton; j++)
+                {
+                    switch (bstate[i,j])
+                    {
+                        case 9:
+                            ButtonTexture1[i,j] = Content.Load<Texture2D>("img_poit9");
+                            break;
+                        case 1:
+                            ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit1");
+                            break;
+                        case 2:
+                            ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit2");
+                            break;
+                        case 3:
+                            ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit3");
+                            break;
+                        case 4:
+                            ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit4");
+                            break;
+                        case 5:
+                            ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit5");
+                            break;
+                        case 6:
+                            ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit6");
+                            break;
+                        case 7:
+                            ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit7");
+                            break;
+                        case 8:
+                            ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit8");
+                            break;
+                        default:
+                            break;
+                    }
+                }
             }
-
-           
-
-         
-            
-          
+            // TODO: Add your update logic here
 
             base.Update(gameTime);
         }
 
-       
+        /// <summary>
+        /// This is called when the game should draw itself.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-            for (int i = 0; i < sobutton; i++)
+            for (int i = 1; i <= sobutton; i++)
             {
-                for (int j = 0; j < sobutton; j++)
+                for (int j = 1; j <= sobutton; j++)
                 {
-                    spriteBatch.Draw(ButtonTexture[i, j], ButtonRectengle[i, j], Color.White);
+                    spriteBatch.Draw(ButtonTexture1[i, j], ButtonRectengle[i, j], Color.White);
                 }
             }
             
             spriteBatch.End();
 
-         
+            // TODO: Add your drawing code here
 
             base.Draw(gameTime);
         }
