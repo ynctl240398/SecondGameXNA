@@ -29,6 +29,7 @@ namespace SecondGameXNA
         private Texture2D[,] ButtonTexture = new Texture2D[sobutton + 1, sobutton + 1];
         private Rectangle[,] ButtonRectengle1 = new Rectangle[sobutton + 1, sobutton + 1];
         private Texture2D[,] ButtonTexture1 = new Texture2D[sobutton + 1, sobutton + 1];
+        Random rand = new Random();
 
 
         public Game1()
@@ -148,9 +149,8 @@ namespace SecondGameXNA
             // TODO: Unload any non ContentManager content here
         }
 
-        private void Start()
+        private void FindAway()
         {
-            Random rand = new Random(); 
             int a = 1;
             int b = 1;
             bstate[1, 1] = 2;
@@ -215,7 +215,10 @@ namespace SecondGameXNA
 
 
             }
+        }
 
+        private void RandomBoom()
+        {
             while (count < soboom) // random boom
             {
                 int i = rand.Next(1, sobutton + 1), j = rand.Next(1, sobutton + 1);
@@ -226,10 +229,10 @@ namespace SecondGameXNA
                     count++;
                 }
             }
+        }
 
-            CheckBoom();
-
-
+        private void FinishButton()
+        {
             for (int i = 1; i <= sobutton; i++)
             {
                 for (int j = 1; j <= sobutton; j++)
@@ -265,9 +268,40 @@ namespace SecondGameXNA
                     }
                 }
             }
-
+        }
+        private void Start()
+        {
+            FindAway();
+            RandomBoom();
+            CheckBoom();
+            FinishButton();
         }
 
+
+        private void CheckCollision()
+        {
+            for (int i = 1; i <= sobutton; i++)
+            {
+                for (int j = 1; j <= sobutton; j++)
+                {
+                    if (player.getbound(ButtonRectengle[i, j]))
+                    {
+                        if (i == 10 && j == 10)
+                            ButtonTexture[i, j] = ButtonTexture1[10, 10];
+                        else
+                            ButtonTexture[i, j] = ButtonTexture1[i, j];
+
+
+                        if (bstate[i, j] == -1)
+                        {
+                            Components.Remove(player);
+                        }
+
+                    }
+
+                }
+            }
+        }
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -285,29 +319,10 @@ namespace SecondGameXNA
                 Start();
             }
 
-            for (int i = 1; i <= sobutton; i++)
-            {
-                for (int j = 1; j <= sobutton; j++)
-                {
-                    if (player.getbound(ButtonRectengle[i, j]))
-                    {
-                        if (i == 10 && j == 10)
-                            ButtonTexture[i, j] = ButtonTexture1[10, 10];
-                        else
-                            ButtonTexture[i, j] = ButtonTexture1[i, j];
-                        
-                                
-                        if (bstate[i,j] == -1)
-                        {
-                            Components.Remove(player);
-                        }
 
-                    }
-                    
-                }
-            }
             // 1 là ô bình thường, -1 là cô có boom
 
+            CheckCollision();
 
             // TODO: Add your update logic here
 
