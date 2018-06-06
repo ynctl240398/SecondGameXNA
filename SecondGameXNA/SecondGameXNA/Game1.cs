@@ -22,7 +22,6 @@ namespace SecondGameXNA
 
         private Player player;
         private Texture2D texture, textureboom;
-        private Texture2D[] textureButton = new Texture2D[10];
         private const int sobutton = 10, sizeButton = 65, soboom = 50;
         private int[,] bstate = new int[sobutton + 2, sobutton + 2];
         private int count = 0;
@@ -59,9 +58,9 @@ namespace SecondGameXNA
                 for (int j = 1; j <= sobutton; j++)
                 {
                     ButtonRectengle[i, j] = new Rectangle(x, y, sizeButton, sizeButton);
-                    ButtonRectengle1[i, j] = new Rectangle(x, y, sizeButton, sizeButton);
-                    x += sizeButton;
+                    ButtonRectengle1[i, j] = new Rectangle(x, y, sizeButton, sizeButton);                    
                     bstate[i, j] = 1;
+                    x += sizeButton;
                 }
                 y += sizeButton;
             }
@@ -98,45 +97,9 @@ namespace SecondGameXNA
                 for (int j = 1; j <= sobutton; j++)            
                         ButtonTexture[i, j] = Content.Load<Texture2D>("img_cell");           
 
-            for (int i = 1; i < 10; i++)
-            {
-                switch (i)
-                {
-                    case 9:
-                        textureButton[9] = Content.Load<Texture2D>("img_poit9");
-                        break;
-                    case 1:
-                        textureButton[1] = Content.Load<Texture2D>("img_poit1");
-                        break;
-                    case 2:
-                        textureButton[2] = Content.Load<Texture2D>("img_poit2");
-                        break;
-                    case 3:
-                        textureButton[3] = Content.Load<Texture2D>("img_poit3");
-                        break;
-                    case 4:
-                        textureButton[4] = Content.Load<Texture2D>("img_poit4");
-                        break;
-                    case 5:
-                        textureButton[5] = Content.Load<Texture2D>("img_poit5");
-                        break;
-                    case 6:
-                        textureButton[6] = Content.Load<Texture2D>("img_poit6");
-                        break;
-                    case 7:
-                        textureButton[7] = Content.Load<Texture2D>("img_poit7");
-                        break;
-                    case 8:
-                        textureButton[8] = Content.Load<Texture2D>("img_poit8");
-                        break;
-                    default:
-                        break;
-                }
-            }
-
             for (int i = 1; i <= sobutton; i++)
                 for (int j = 1; j <= sobutton; j++)
-                    ButtonTexture1[i, j] = textureButton[9];
+                    ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit9");
 
             // TODO: use this.Content to load your game content here
         }
@@ -197,33 +160,85 @@ namespace SecondGameXNA
             // TODO: Unload any non ContentManager content here
         }
 
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Update(GameTime gameTime)
+        private void Start()
         {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
-            if (player == null)
+            Random rand = new Random(); 
+            int a = 0;
+            int b = 0;
+            bstate[0, 0] = 2;
+
+            switch (rand.Next(1, 2))
             {
-                player = new Player(this, ref texture);
-                Components.Add(player);
+                case 1:
+                    bstate[0, 1] = 2;
+                    break;
+                    b = 1;
+                case 2:
+                    bstate[1, 0] = 2;
+                    a = 1;
+                    break;
             }
 
-            // 1 là ô bình thường, -1 là cô có boom
-            
-            Random rand = new Random();
-            while (count < soboom)
+
+            while (bstate[10, 10] != 2)
             {
-                int i = rand.Next(sobutton), j = rand.Next(sobutton);
-                if (bstate[i, j] == 1 && (i != 1 && j != 1))
+                int[] r = new int[5];
+                r[1] = 1;
+                r[2] = 2;
+                r[3] = 3;
+                r[4] = 4;
+                if (a == 1) r[3] = 0;
+                if (a == 10) r[1] = 0;
+                if (b == 1) r[4] = 0;
+                if (b == 10) r[2] = 0;
+
+                int t = rand.Next(1, 4);
+                while (r[t] == 0)
+                    t = rand.Next(1, 4);
+
+                switch (t)
                 {
-                    bstate[i, j] = -1;
-                    ButtonTexture1[i, j] = textureboom;
-                    count++;
+                    case 1:
+                        bstate[a + 1, b] = 2;
+                        //  ButtonTexture[a + 1, b] = tetu;
+                        a = a + 1;
+                        break;
+                    case 2:
+                        bstate[a, b + 1] = 2;
+
+                        //   ButtonTexture[a, b + 1] = tetu;
+                        b = b + 1;
+                        break;
+                    case 3:
+                        bstate[a - 1, b] = 2;
+                        //   ButtonTexture[a - 1, b] = tetu;
+                        a = a - 1;
+                        break;
+                    case 4:
+                        bstate[a, b - 1] = 2;
+                        // ButtonTexture[a, b - 1] = tetu;
+                        b = b - 1;
+                        break;
+                }
+
+
+            }
+
+            while (count < soboom) // random boom
+            {
+                int i = rand.Next(1, sobutton + 1), j = rand.Next(1, sobutton + 1);
+                if (bstate[i, j] == 1)
+                {
+                    if (i == 1 && j == 1)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        bstate[i, j] = -1;
+                        ButtonTexture1[i, j] = textureboom;
+                        count++;
+                    }
                 }
             }
 
@@ -234,11 +249,8 @@ namespace SecondGameXNA
             {
                 for (int j = 1; j <= sobutton; j++)
                 {
-                    switch (bstate[i,j])
+                    switch (bstate[i, j])
                     {
-                        case 9:
-                            ButtonTexture1[i,j] = Content.Load<Texture2D>("img_poit9");
-                            break;
                         case 1:
                             ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit1");
                             break;
@@ -268,6 +280,37 @@ namespace SecondGameXNA
                     }
                 }
             }
+
+            for (int i = 0; i < sobutton; i++)
+            {
+                for (int j = 0; j < sobutton; j++)
+                {
+                    if (player.getbound(ButtonRectengle[i, j]))
+                        ButtonTexture[i, j] = ButtonTexture1[i, j];
+                }
+            }
+        }
+
+        /// <summary>
+        /// Allows the game to run logic such as updating the world,
+        /// checking for collisions, gathering input, and playing audio.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        protected override void Update(GameTime gameTime)
+        {
+            // Allows the game to exit
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+                this.Exit();
+            if (player == null)
+            {
+                player = new Player(this, ref texture);
+                Components.Add(player);
+                Start();
+            }
+
+            // 1 là ô bình thường, -1 là cô có boom
+            
+            
             // TODO: Add your update logic here
 
             base.Update(gameTime);

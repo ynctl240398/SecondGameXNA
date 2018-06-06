@@ -44,16 +44,17 @@ namespace SecondGameXNA
             rectangle = new Rectangle(0, 0, wPlayer, hPlayer);
             sBatch = (SpriteBatch)Game.Services.GetService(typeof(SpriteBatch));
         }
-            
-        public bool CheckColision(Rectangle rec)
+
+        public bool getbound(Rectangle rect)
         {
-            Vector2 a = new Vector2(this.rectangle.Center.X, this.rectangle.Center.Y);
-            Vector2 b = new Vector2(rec.Center.X, rec.Center.Y);
-            return (Vector2.Distance(a, b) < 32);
+            Point p1 = new Rectangle(Position.X, Position.Y, wPlayer, hPlayer).Center;
+            Vector2 player = new Vector2(p1.X, p1.Y);
+
+            Point p2 = rect.Center;
+            Vector2 vt2 = new Vector2(p2.X, p2.Y);
+            return (Vector2.Distance(player, vt2) < 32);
         }
 
-
-      
         private void UpdateStatus()
         {
             if (Moving)
