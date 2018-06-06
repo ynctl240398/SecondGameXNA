@@ -24,7 +24,7 @@ namespace SecondGameXNA
         private Point Position;
         private Point FirstPosition;
         private Rectangle rectangle;
-        private const int Speed = 65;
+        private const int Speed = 2;
         private const int wPlayer = 65, hPlayer = 65;
         private int LastTickCount;
         private const int Timer = 70;
@@ -44,17 +44,12 @@ namespace SecondGameXNA
             rectangle = new Rectangle(0, 0, wPlayer, hPlayer);
             sBatch = (SpriteBatch)Game.Services.GetService(typeof(SpriteBatch));
         }
-
-        public bool CheckCollision(Rectangle rec)
-        {
-            Rectangle spriterect = new Rectangle(Position.X, Position.Y, wPlayer, hPlayer);
-            return spriterect.Intersects(rec);
-        }
             
-
-        public Rectangle GetBounds()
+        public bool CheckColision(Rectangle rec)
         {
-            return new Rectangle(Position.X, Position.Y, wPlayer, hPlayer);
+            Vector2 a = new Vector2(this.rectangle.Center.X, this.rectangle.Center.Y);
+            Vector2 b = new Vector2(rec.Center.X, rec.Center.Y);
+            return (Vector2.Distance(a, b) < 32);
         }
 
 
@@ -74,8 +69,7 @@ namespace SecondGameXNA
         private void Move()
         {
             Moving = true;
-
-            Thread.Sleep(100);
+            
 
             if (directionOfmotion == DirectionOfMotion.Down)
             {

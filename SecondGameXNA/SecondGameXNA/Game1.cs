@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -21,14 +21,16 @@ namespace SecondGameXNA
         SpriteBatch spriteBatch;
 
         private Player player;
-        private Texture2D texture, textureButton, textureboom;
-
-        private const int sobutton = 10, sizeButton = 65, soboom = 40;
-        private int[,] bstate = new int[sobutton, sobutton];
+        private Texture2D texture, textureboom;
+        private Texture2D[] textureButton = new Texture2D[10];
+        private const int sobutton = 10, sizeButton = 65, soboom = 50;
+        private int[,] bstate = new int[sobutton + 2, sobutton + 2];
         private int count = 0;
-        private Rectangle[,] ButtonRectengle = new Rectangle[sobutton, sobutton];
-        private Texture2D[,] ButtonTexture = new Texture2D[sobutton, sobutton];
-        
+        private Rectangle[,] ButtonRectengle = new Rectangle[sobutton + 1, sobutton + 1];
+        private Texture2D[,] ButtonTexture = new Texture2D[sobutton + 1, sobutton + 1];
+        private Rectangle[,] ButtonRectengle1 = new Rectangle[sobutton + 1, sobutton + 1];
+        private Texture2D[,] ButtonTexture1 = new Texture2D[sobutton + 1, sobutton + 1];
+
 
         public Game1()
         {
@@ -48,21 +50,29 @@ namespace SecondGameXNA
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            Window.Title = "D� M�n";
+            Window.Title = "Dò Mìn";
 
             int y = 0;
-            for (int i = 0; i < sobutton; i++)
+            for (int i = 1; i <= sobutton; i++)
             {
                 int x = 0;
-                for (int j = 0; j < sobutton; j++)
+                for (int j = 1; j <= sobutton; j++)
                 {
-                    ButtonRectengle[i,j] = new Rectangle(x, y, sizeButton, sizeButton);
+                    ButtonRectengle[i, j] = new Rectangle(x, y, sizeButton, sizeButton);
+                    ButtonRectengle1[i, j] = new Rectangle(x, y, sizeButton, sizeButton);
                     x += sizeButton;
                     bstate[i, j] = 1;
                 }
                 y += sizeButton;
             }
 
+            for (int i = 0; i <= sobutton + 1; i++)
+            {
+                bstate[i, 0] = 10;
+                bstate[0, i] = 10;
+                bstate[sobutton + 1, i] = 10;
+                bstate[i, sobutton + 1] = 10;
+            }
 
             base.Initialize();
         }
@@ -80,18 +90,102 @@ namespace SecondGameXNA
 
             texture = Content.Load<Texture2D>("player");
 
-            textureButton = Content.Load<Texture2D>("img_poit9");
-
             textureboom = Content.Load<Texture2D>("img_bom");
 
             //ButtonTexture[0, 0] = Content.Load<Texture2D>("img_poit9");
 
-            for (int i = 0; i < sobutton; i++)
-                for (int j = 0; j < sobutton; j++)            
-                        ButtonTexture[i, j] = Content.Load<Texture2D>("img_cell");
- 
-          
+            for (int i = 1; i <= sobutton; i++)
+                for (int j = 1; j <= sobutton; j++)            
+                        ButtonTexture[i, j] = Content.Load<Texture2D>("img_cell");           
+
+            for (int i = 1; i < 10; i++)
+            {
+                switch (i)
+                {
+                    case 9:
+                        textureButton[9] = Content.Load<Texture2D>("img_poit9");
+                        break;
+                    case 1:
+                        textureButton[1] = Content.Load<Texture2D>("img_poit1");
+                        break;
+                    case 2:
+                        textureButton[2] = Content.Load<Texture2D>("img_poit2");
+                        break;
+                    case 3:
+                        textureButton[3] = Content.Load<Texture2D>("img_poit3");
+                        break;
+                    case 4:
+                        textureButton[4] = Content.Load<Texture2D>("img_poit4");
+                        break;
+                    case 5:
+                        textureButton[5] = Content.Load<Texture2D>("img_poit5");
+                        break;
+                    case 6:
+                        textureButton[6] = Content.Load<Texture2D>("img_poit6");
+                        break;
+                    case 7:
+                        textureButton[7] = Content.Load<Texture2D>("img_poit7");
+                        break;
+                    case 8:
+                        textureButton[8] = Content.Load<Texture2D>("img_poit8");
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            for (int i = 1; i <= sobutton; i++)
+                for (int j = 1; j <= sobutton; j++)
+                    ButtonTexture1[i, j] = textureButton[9];
+
             // TODO: use this.Content to load your game content here
+        }
+
+        public void CheckBoom()
+        {
+            for (int i = 1; i <= sobutton; i++)
+            {
+                for (int j = 1; j <= sobutton; j++)
+                {
+                    int count = 0;
+                    if (bstate[i, j] != -1)
+                    {
+                        if (bstate[i - 1, j - 1] == -1)
+                        {
+                            count++;
+                        }
+                        if (bstate[i - 1, j] == -1)
+                        {
+                            count++;
+                        }
+                        if (bstate[i - 1, j + 1] == -1)
+                        {
+                            count++;
+                        }
+                        if (bstate[i, j - 1] == -1)
+                        {
+                            count++;
+                        }
+                        if (bstate[i, j + 1] == -1)
+                        {
+                            count++;
+                        }
+                        if (bstate[i + 1, j - 1] == -1)
+                        {
+                            count++;
+                        }
+                        if (bstate[i + 1, j] == -1)
+                        {
+                            count++;
+                        }
+                        if (bstate[i + 1, j + 1] == -1)
+                        {
+                            count++;
+                        }
+                    }
+                    bstate[i, j] = count;
+                }
+            }
         }
 
         /// <summary>
@@ -119,41 +213,61 @@ namespace SecondGameXNA
                 Components.Add(player);
             }
 
-            for (int i = 0; i < sobutton; i++)
-            {
-                for (int j = 0; j < sobutton; j++)
-                {
-                    if (player.GetBounds() == ButtonRectengle[i,j])
-                                    
-                        ButtonTexture[i, j] = textureButton;
-                }
-            }
+            // 1 là ô bình thường, -1 là cô có boom
+            
             Random rand = new Random();
             while (count < soboom)
             {
-                //for (int i = 0; i < sobutton; i++)
-                //{
-                //    for (int j = 0; j < sobutton; j++)
-                //    {
-                //        i = rand.Next(sobutton);
-                //        j = rand.Next(sobutton);
-                //        if ()
-                //        {
-
-                //        }
-                //    }
-                //}
                 int i = rand.Next(sobutton), j = rand.Next(sobutton);
-                if (bstate[i,j] == 1)
+                if (bstate[i, j] == 1 && (i != 1 && j != 1))
                 {
                     bstate[i, j] = -1;
-                    ButtonTexture[i, j] = textureboom;
+                    ButtonTexture1[i, j] = textureboom;
                     count++;
                 }
             }
 
-         
-            
+            CheckBoom();
+
+
+            for (int i = 1; i <= sobutton; i++)
+            {
+                for (int j = 1; j <= sobutton; j++)
+                {
+                    switch (bstate[i,j])
+                    {
+                        case 9:
+                            ButtonTexture1[i,j] = Content.Load<Texture2D>("img_poit9");
+                            break;
+                        case 1:
+                            ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit1");
+                            break;
+                        case 2:
+                            ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit2");
+                            break;
+                        case 3:
+                            ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit3");
+                            break;
+                        case 4:
+                            ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit4");
+                            break;
+                        case 5:
+                            ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit5");
+                            break;
+                        case 6:
+                            ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit6");
+                            break;
+                        case 7:
+                            ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit7");
+                            break;
+                        case 8:
+                            ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit8");
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
             // TODO: Add your update logic here
 
             base.Update(gameTime);
@@ -168,11 +282,11 @@ namespace SecondGameXNA
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-            for (int i = 0; i < sobutton; i++)
+            for (int i = 1; i <= sobutton; i++)
             {
-                for (int j = 0; j < sobutton; j++)
+                for (int j = 1; j <= sobutton; j++)
                 {
-                    spriteBatch.Draw(ButtonTexture[i, j], ButtonRectengle[i, j], Color.White);
+                    spriteBatch.Draw(ButtonTexture1[i, j], ButtonRectengle[i, j], Color.White);
                 }
             }
             
