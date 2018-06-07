@@ -21,15 +21,17 @@ namespace SecondGameXNA
         SpriteBatch spriteBatch;
 
         private Player player;
-        private Texture2D texture, textureboom;
-        private const int sobutton = 10, sizeButton = 65, soboom = 35;
+        private Texture2D texture, textureboom, TextureExplosion;
+        private const int sobutton = 10, sizeButton = 65, soboom = 30;
         private int[,] bstate = new int[sobutton + 2, sobutton + 2];
         private int count = 0;
         private Rectangle[,] ButtonRectengle = new Rectangle[sobutton + 1, sobutton + 1];
         private Texture2D[,] ButtonTexture = new Texture2D[sobutton + 1, sobutton + 1];
         private Rectangle[,] ButtonRectengle1 = new Rectangle[sobutton + 1, sobutton + 1];
         private Texture2D[,] ButtonTexture1 = new Texture2D[sobutton + 1, sobutton + 1];
-        Random rand = new Random();
+        private Random rand = new Random();
+        private Explosion explosion;
+        private int fx, fy;
 
 
         public Game1()
@@ -74,6 +76,8 @@ namespace SecondGameXNA
                 bstate[i, sobutton + 1] = 10;
             }
 
+            fx = rand.Next(5, 10);
+            fy = rand.Next(5, 10);
 
             base.Initialize();
         }
@@ -87,13 +91,13 @@ namespace SecondGameXNA
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            IsMouseVisible = true;
+
             Services.AddService(typeof(SpriteBatch), spriteBatch);
 
             texture = Content.Load<Texture2D>("player");
 
             textureboom = Content.Load<Texture2D>("img_bom");
-
-            //ButtonTexture[0, 0] = Content.Load<Texture2D>("img_poit9");
 
             for (int i = 1; i <= sobutton; i++)
                 for (int j = 1; j <= sobutton; j++)            
@@ -103,7 +107,8 @@ namespace SecondGameXNA
                 for (int j = 1; j <= sobutton; j++)
                     ButtonTexture1[i, j] = Content.Load<Texture2D>("img_poit9");
 
-            ButtonTexture1[10, 10] = Content.Load<Texture2D>("Img_finish");
+            ButtonTexture1[fx, fy] = Content.Load<Texture2D>("Img_finish");
+            TextureExplosion = Content.Load<Texture2D>("Explosion");
 
             // TODO: use this.Content to load your game content here
         }
@@ -117,7 +122,7 @@ namespace SecondGameXNA
                     int count = 0;
                     if (bstate[i, j] != -1)
                     {
-                        if (i == 10 && j == 10)
+                        if (i == fx && j == fy)
                         {
                             break;
                         }
@@ -137,7 +142,7 @@ namespace SecondGameXNA
                     }
                 }
             }
-            bstate[10, 10] = 0;
+            bstate[fx, fy] = 0;
         }
 
         /// <summary>
@@ -170,7 +175,7 @@ namespace SecondGameXNA
             }
 
 
-            while (bstate[10, 10] != 2)
+            while (bstate[fx, fy] != 2)
             {
                 int[] r = new int[5];
                 r[1] = 1;
@@ -286,14 +291,25 @@ namespace SecondGameXNA
                 {
                     if (player.getbound(ButtonRectengle[i, j]))
                     {
-                        if (i == 10 && j == 10)
-                            ButtonTexture[i, j] = ButtonTexture1[10, 10];
+                        if (i == fx && j == fy)
+                        {
+                            ButtonTexture[i, j] = ButtonTexture1[fx, fy];
+                            for (int x = 1; x <= sobutton; x++)
+                            {
+                                for (int y = 1; y <= sobutton; y++)
+                                {
+                                    ButtonTexture[x, y] = ButtonTexture1[x, y];
+                                }
+                            }
+                        }
                         else
                             ButtonTexture[i, j] = ButtonTexture1[i, j];
 
 
                         if (bstate[i, j] == -1)
                         {
+                            explosion = new Explosion(this, new Point(ButtonRectengle[i,j].X, ButtonRectengle[i,j].Y), ref TextureExplosion);
+                            Components.Add(explosion);
                             Components.Remove(player);
                         }
 
@@ -337,20 +353,19 @@ namespace SecondGameXNA
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
             for (int i = 1; i <= sobutton; i++)
             {
                 for (int j = 1; j <= sobutton; j++)
                 {
-                    spriteBatch.Draw(ButtonTexture[i, j], ButtonRectengle[i, j], Color.White);
+                    spriteBatch.Draw(ButtonTexture1[i, j], ButtonRectengle[i, j], Color.White);
                 }
             }
-            
             spriteBatch.End();
 
             // TODO: Add your drawing code here
-
-            base.Draw(gameTime);
+            base.Draw(gameTime);            
         }
     }
 }

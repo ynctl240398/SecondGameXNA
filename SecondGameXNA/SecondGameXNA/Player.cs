@@ -70,7 +70,6 @@ namespace SecondGameXNA
         private void Move()
         {
             Moving = true;
-            
 
             if (directionOfmotion == DirectionOfMotion.Down)
             {
@@ -127,23 +126,22 @@ namespace SecondGameXNA
                 LastTickCount = System.Environment.TickCount;
                 UpdateStatus();
             }
-
-            int lasttickcount1 = System.Environment.TickCount;
-
-            if (keyboard.IsKeyDown(Keys.A) || keyboard.IsKeyDown(Keys.Left))
-            {
-                    directionOfmotion = DirectionOfMotion.Left;
-                    Move();
-
-                    return;
-                
-            }
-            else if (keyboard.IsKeyDown(Keys.D) || keyboard.IsKeyDown(Keys.Right))
+            
+            
+            if (keyboard.IsKeyDown(Keys.D) || keyboard.IsKeyDown(Keys.Right))
             {
                     directionOfmotion = DirectionOfMotion.Rigth;
                     Move();
 
                     return;
+
+            }
+            else if(keyboard.IsKeyDown(Keys.A) || keyboard.IsKeyDown(Keys.Left))
+            {
+                directionOfmotion = DirectionOfMotion.Left;
+                Move();
+
+                return;
 
             }
             else if (keyboard.IsKeyDown(Keys.W) || keyboard.IsKeyDown(Keys.Up))
